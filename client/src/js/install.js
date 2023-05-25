@@ -1,16 +1,26 @@
-const butInstall = document.getElementById('buttonInstall');
+const butInstall = document.getElementById("buttonInstall");
 
 window.addEventListener('beforeinstallprompt', (event) => {
-    event.preventDefault();
-    butInstall.style.visibility = 'visible';
-  
-    butInstall.addEventListener('click', () => {
-      event.prompt();
-      butInstall.setAttribute('disabled', true);
-      butInstall.textContent = 'Installed!';
-    });
+    window.deferredPrompt = event;
+    butInstall.classList.toggle('hidden', false);
   });
+
+butInstall.addEventListener('click', async () => {
   
-  window.addEventListener('appinstalled', (event) => {
-    console.log('👍', 'appinstalled', event);
-  });
+  const promptEvent = window.deferredPrompt;
+
+  if (!promptEvent) {
+   return;
+  }
+
+  promptEvent.prompt();
+  
+  window.deferredPrompt = null;
+  
+  butInstall.classList.toggle('hidden', true);
+});
+
+window.addEventListener('appinstalled', (event) => {
+  
+  window.deferredPrompt = null;
+}); 
